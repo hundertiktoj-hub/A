@@ -1,0 +1,315 @@
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local Lighting = game:GetService("Lighting")
+local CoreGui = game:GetService("CoreGui")
+
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local rootPart = character:WaitForChild("HumanoidRootPart")
+
+player.CharacterAdded:Connect(function(char)
+  character = char
+  rootPart = char:WaitForChild("HumanoidRootPart")
+end)
+
+local isMobile = UserInputService.TouchEnabled
+local panelWidth  = isMobile and 320 or 240
+local panelHeight = isMobile and 300 or 230
+local btnHeight   = isMobile and 62 or 42
+local btnFont     = isMobile and 18 or 14
+local headerSize  = isMobile and 50 or 38
+
+if CoreGui:FindFirstChild("MainGUI") then
+  CoreGui:FindFirstChild("MainGUI"):Destroy()
+end
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "MainGUI"
+screenGui.ResetOnSpawn = false
+screenGui.IgnoreGuiInset = true
+screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+screenGui.Parent = CoreGui
+
+-- Музыка
+if workspace:FindFirstChild("MGUI_Sound") then
+  workspace:FindFirstChild("MGUI_Sound"):Destroy()
+end
+local sound = Instance.new("Sound")
+sound.Name = "MGUI_Sound"
+sound.SoundId = "rbxassetid://137215969559232"
+sound.Volume = 0.5
+sound.Looped = true
+sound.Parent = workspace
+sound:Play()
+
+-- Надпись sherstyanaya
+local watermark = Instance.new("TextLabel")
+watermark.Size = UDim2.new(0, 200, 0, 24)
+watermark.Position = UDim2.new(0.5, -100, 1, -36)
+watermark.BackgroundTransparency = 1
+watermark.Text = "sherstyanaya"
+watermark.TextColor3 = Color3.fromRGB(255, 255, 255)
+watermark.TextTransparency = 0.4
+watermark.TextSize = 13
+watermark.Font = Enum.Font.GothamBold
+watermark.ZIndex = 10
+watermark.Parent = screenGui
+
+-- Авто Fullbright
+local function applyFullbright()
+  Lighting.Brightness = 2
+  Lighting.ClockTime = 14
+  Lighting.FogEnd = 100000
+  Lighting.FogStart = 100000
+  Lighting.GlobalShadows = false
+  Lighting.Ambient = Color3.fromRGB(255, 255, 255)
+  Lighting.OutdoorAmbient = Color3.fromRGB(255, 255, 255)
+  for _, effect in ipairs(Lighting:GetChildren()) do
+    if effect:IsA("BlurEffect") or effect:IsA("DepthOfFieldEffect")
+      or effect:IsA("SunRaysEffect") or effect:IsA("ColorCorrectionEffect") then
+      effect.Enabled = false
+    end
+  end
+end
+
+applyFullbright()
+RunService.Heartbeat:Connect(function()
+  if Lighting.Brightness ~= 2 then
+    applyFullbright()
+  end
+end)
+
+-- Панель
+local panel = Instance.new("Frame")
+panel.Name = "Panel"
+panel.Size = UDim2.new(0, panelWidth, 0, panelHeight)
+panel.Position = UDim2.new(0.5, -panelWidth / 2, 0.5, -panelHeight / 2)
+panel.BackgroundColor3 = Color3.fromRGB(10, 10, 18)
+panel.BackgroundTransparency = 0.06
+panel.BorderSizePixel = 0
+panel.Parent = screenGui
+
+local panelCorner = Instance.new("UICorner")
+panelCorner.CornerRadius = UDim.new(0, 14)
+panelCorner.Parent = panel
+
+local panelStroke = Instance.new("UIStroke")
+panelStroke.Color = Color3.fromRGB(255, 255, 255)
+panelStroke.Transparency = 0.82
+panelStroke.Thickness = 1
+panelStroke.Parent = panel
+
+-- Шапка
+local header = Instance.new("Frame")
+header.Size = UDim2.new(1, 0, 0, headerSize)
+header.Position = UDim2.new(0, 0, 0, 0)
+header.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+header.BackgroundTransparency = 0.92
+header.BorderSizePixel = 0
+header.ZIndex = 2
+header.Parent = panel
+
+local headerCorner = Instance.new("UICorner")
+headerCorner.CornerRadius = UDim.new(0, 14)
+headerCorner.Parent = header
+
+local headerLabel = Instance.new("TextLabel")
+headerLabel.Size = UDim2.new(1, -50, 1, 0)
+headerLabel.Position = UDim2.new(0, 14, 0, 0)
+headerLabel.BackgroundTransparency = 1
+headerLabel.Text = "⠿  MENU"
+headerLabel.TextColor3 = Color3.fromRGB(180, 180, 190)
+headerLabel.TextSize = isMobile and 15 or 12
+headerLabel.Font = Enum.Font.GothamBold
+headerLabel.TextXAlignment = Enum.TextXAlignment.Left
+headerLabel.ZIndex = 2
+headerLabel.Parent = header
+
+-- Кнопка X
+local closeBtn = Instance.new("TextButton")
+closeBtn.Size = UDim2.new(0, isMobile and 36 or 26, 0, isMobile and 36 or 26)
+closeBtn.Position = UDim2.new(1, isMobile and -42 or -32, 0, isMobile and 7 or 6)
+closeBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
+closeBtn.BorderSizePixel = 0
+closeBtn.Text = "✕"
+closeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeBtn.TextSize = isMobile and 16 or 13
+closeBtn.Font = Enum.Font.GothamBold
+closeBtn.ZIndex = 5
+closeBtn.Parent = panel
+
+local closeCorner = Instance.new("UICorner")
+closeCorner.CornerRadius = UDim.new(1, 0)
+closeCorner.Parent = closeBtn
+
+closeBtn.MouseButton1Click:Connect(function()
+  panel.Visible = false
+end)
+
+-- Контент
+local listFrame = Instance.new("Frame")
+listFrame.Size = UDim2.new(1, 0, 1, -headerSize)
+listFrame.Position = UDim2.new(0, 0, 0, headerSize)
+listFrame.BackgroundTransparency = 1
+listFrame.Parent = panel
+
+local layout = Instance.new("UIListLayout")
+layout.Padding = UDim.new(0, 8)
+layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+layout.VerticalAlignment = Enum.VerticalAlignment.Center
+layout.Parent = listFrame
+
+local pad = Instance.new("UIPadding")
+pad.PaddingLeft = UDim.new(0, 14)
+pad.PaddingRight = UDim.new(0, 14)
+pad.Parent = listFrame
+
+local killerActive = false
+local killerConnection = nil
+local safePlatform = nil
+
+local function makeButton(text, color)
+  local btn = Instance.new("TextButton")
+  btn.Size = UDim2.new(1, 0, 0, btnHeight)
+  btn.BackgroundColor3 = color
+  btn.BorderSizePixel = 0
+  btn.Text = text
+  btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+  btn.TextSize = btnFont
+  btn.Font = Enum.Font.GothamSemibold
+  btn.AutoButtonColor = false
+  btn.Parent = listFrame
+
+  local c = Instance.new("UICorner")
+  c.CornerRadius = UDim.new(0, 9)
+  c.Parent = btn
+
+  btn.MouseEnter:Connect(function()
+    btn.BackgroundTransparency = 0.2
+  end)
+  btn.MouseLeave:Connect(function()
+    btn.BackgroundTransparency = 0
+  end)
+
+  return btn
+end
+
+local btnKiller   = makeButton("🎯  Killer: OFF", Color3.fromRGB(180, 40, 40))
+local btnOptimize = makeButton("⚡️  Оптимизация", Color3.fromRGB(40, 100, 180))
+local btnSafe     = makeButton("🛡  Safe",        Color3.fromRGB(40, 160, 80))
+
+-- Перетаскивание
+local dragging = false
+local dragStart = nil
+local startPos = nil
+
+header.InputBegan:Connect(function(input)
+  if input.UserInputType == Enum.UserInputType.MouseButton1
+    or input.UserInputType == Enum.UserInputType.Touch then
+    dragging = true
+    dragStart = input.Position
+    startPos = panel.Position
+  end
+end)
+
+header.InputEnded:Connect(function(input)
+  if input.UserInputType == Enum.UserInputType.MouseButton1
+    or input.UserInputType == Enum.UserInputType.Touch then
+    dragging = false
+  end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+  if dragging and (
+    input.UserInputType == Enum.UserInputType.MouseMovement or
+    input.UserInputType == Enum.UserInputType.Touch
+  ) then
+    local delta = input.Position - dragStart
+    panel.Position = UDim2.new(
+      startPos.X.Scale,
+      startPos.X.Offset + delta.X,
+      startPos.Y.Scale,
+      startPos.Y.Offset + delta.Y
+    )
+  end
+end)
+
+-- KILLER
+local function getNearestPlayer()
+  local nearest, nearestDist = nil, math.huge
+  for _, p in ipairs(Players:GetPlayers()) do
+    if p ~= player and p.Character then
+      local root = p.Character:FindFirstChild("HumanoidRootPart")
+      if root then
+        local dist = (root.Position - rootPart.Position).Magnitude
+        if dist < nearestDist then
+          nearest = p
+          nearestDist = dist
+        end
+      end
+    end
+  end
+  return nearest
+end
+
+btnKiller.MouseButton1Click:Connect(function()
+  killerActive = not killerActive
+  if killerActive then
+    btnKiller.Text = "🎯  Killer: ON"
+    btnKiller.BackgroundColor3 = Color3.fromRGB(220, 60, 60)
+    killerConnection = RunService.Heartbeat:Connect(function()
+      local target = getNearestPlayer()
+      if target and target.Character then
+        local targetRoot = target.Character:FindFirstChild("HumanoidRootPart")
+        if targetRoot then
+          rootPart.CFrame = targetRoot.CFrame * CFrame.new(0, 0, 0.8)
+        end
+      end
+    end)
+  else
+    btnKiller.Text = "🎯  Killer: OFF"
+    btnKiller.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
+    if killerConnection then
+      killerConnection:Disconnect()
+      killerConnection = nil
+    end
+  end
+end)
+
+-- ОПТИМИЗАЦИЯ
+btnOptimize.MouseButton1Click:Connect(function()
+  for _, obj in ipairs(workspace:GetDescendants()) do
+    if obj:IsA("BasePart") then
+      obj.CastShadow = false
+    end
+  end
+  settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
+  Lighting.GlobalShadows = false
+  for _, effect in ipairs(Lighting:GetChildren()) do
+    if effect:IsA("BlurEffect") or effect:IsA("DepthOfFieldEffect")
+      or effect:IsA("SunRaysEffect") or effect:IsA("ColorCorrectionEffect") then
+      effect.Enabled = false
+    end
+  end
+  btnOptimize.Text = "⚡️  Готово!"
+  btnOptimize.BackgroundColor3 = Color3.fromRGB(30, 130, 60)
+end)
+
+-- SAFE
+btnSafe.MouseButton1Click:Connect(function()
+  if safePlatform and safePlatform.Parent then
+    rootPart.CFrame = safePlatform.CFrame + Vector3.new(0, 5, 0)
+    return
+  end
+  safePlatform = Instance.new("Part")
+  safePlatform.Name = "SafePlatform"
+  safePlatform.Size = Vector3.new(20, 1, 20)
+  safePlatform.Position = Vector3.new(rootPart.Position.X, 800, rootPart.Position.Z)
+  safePlatform.Anchored = true
+  safePlatform.BrickColor = BrickColor.new("Dark blue")
+  safePlatform.Material = Enum.Material.SmoothPlastic
+  safePlatform.Parent = workspace
+  task.wait(0.1)
+  rootPart.CFrame = safePlatform.CFrame + Vector3.new(0, 5, 0)
+end)

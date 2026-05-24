@@ -31,7 +31,6 @@ screenGui.IgnoreGuiInset = true
 screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 screenGui.Parent = CoreGui
 
--- Музыка
 if workspace:FindFirstChild("MGUI_Sound") then
   workspace:FindFirstChild("MGUI_Sound"):Destroy()
 end
@@ -43,7 +42,6 @@ sound.Looped = true
 sound.Parent = workspace
 sound:Play()
 
--- Надпись sherstyanaya
 local watermark = Instance.new("TextLabel")
 watermark.Size = UDim2.new(0, 200, 0, 24)
 watermark.Position = UDim2.new(0.5, -100, 1, -36)
@@ -56,7 +54,6 @@ watermark.Font = Enum.Font.GothamBold
 watermark.ZIndex = 10
 watermark.Parent = screenGui
 
--- Авто Fullbright
 local function applyFullbright()
   Lighting.Brightness = 2
   Lighting.ClockTime = 14
@@ -80,7 +77,6 @@ RunService.Heartbeat:Connect(function()
   end
 end)
 
--- Панель
 local panel = Instance.new("Frame")
 panel.Name = "Panel"
 panel.Size = UDim2.new(0, panelWidth, 0, panelHeight)
@@ -100,7 +96,6 @@ panelStroke.Transparency = 0.82
 panelStroke.Thickness = 1
 panelStroke.Parent = panel
 
--- Шапка
 local header = Instance.new("Frame")
 header.Size = UDim2.new(1, 0, 0, headerSize)
 header.Position = UDim2.new(0, 0, 0, 0)
@@ -126,7 +121,6 @@ headerLabel.TextXAlignment = Enum.TextXAlignment.Left
 headerLabel.ZIndex = 2
 headerLabel.Parent = header
 
--- Кнопка X
 local closeBtn = Instance.new("TextButton")
 closeBtn.Size = UDim2.new(0, isMobile and 36 or 26, 0, isMobile and 36 or 26)
 closeBtn.Position = UDim2.new(1, isMobile and -42 or -32, 0, isMobile and 7 or 6)
@@ -147,7 +141,6 @@ closeBtn.MouseButton1Click:Connect(function()
   panel.Visible = false
 end)
 
--- Контент
 local listFrame = Instance.new("Frame")
 listFrame.Size = UDim2.new(1, 0, 1, -headerSize)
 listFrame.Position = UDim2.new(0, 0, 0, headerSize)
@@ -195,11 +188,10 @@ local function makeButton(text, color)
   return btn
 end
 
-local btnKiller   = makeButton("🎯  Killer: OFF", Color3.fromRGB(180, 40, 40))
-local btnOptimize = makeButton("⚡️  Оптимизация", Color3.fromRGB(40, 100, 180))
-local btnSafe     = makeButton("🛡  Safe",        Color3.fromRGB(40, 160, 80))
+local btnKiller   = makeButton("  Killer: OFF", Color3.fromRGB(180, 40, 40))
+local btnOptimize = makeButton("  Оптимизация", Color3.fromRGB(40, 100, 180))
+local btnSafe     = makeButton("  Safe",        Color3.fromRGB(40, 160, 80))
 
--- Перетаскивание
 local dragging = false
 local dragStart = nil
 local startPos = nil
@@ -235,7 +227,6 @@ UserInputService.InputChanged:Connect(function(input)
   end
 end)
 
--- KILLER
 local function getNearestPlayer()
   local nearest, nearestDist = nil, math.huge
   for _, p in ipairs(Players:GetPlayers()) do
@@ -256,7 +247,7 @@ end
 btnKiller.MouseButton1Click:Connect(function()
   killerActive = not killerActive
   if killerActive then
-    btnKiller.Text = "🎯  Killer: ON"
+    btnKiller.Text = "  Killer: ON"
     btnKiller.BackgroundColor3 = Color3.fromRGB(220, 60, 60)
     killerConnection = RunService.Heartbeat:Connect(function()
       local target = getNearestPlayer()
@@ -277,7 +268,6 @@ btnKiller.MouseButton1Click:Connect(function()
   end
 end)
 
--- ОПТИМИЗАЦИЯ
 btnOptimize.MouseButton1Click:Connect(function()
   for _, obj in ipairs(workspace:GetDescendants()) do
     if obj:IsA("BasePart") then
@@ -292,11 +282,10 @@ btnOptimize.MouseButton1Click:Connect(function()
       effect.Enabled = false
     end
   end
-  btnOptimize.Text = "⚡️  Готово!"
+  btnOptimize.Text = "  Готово!"
   btnOptimize.BackgroundColor3 = Color3.fromRGB(30, 130, 60)
 end)
 
--- SAFE
 btnSafe.MouseButton1Click:Connect(function()
   if safePlatform and safePlatform.Parent then
     rootPart.CFrame = safePlatform.CFrame + Vector3.new(0, 5, 0)
